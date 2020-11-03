@@ -37,32 +37,38 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class) // Adiciona a extensão do mockito para criar os objetos dublês
 public class BeerServiceTest {
 
     private static final long INVALID_BEER_ID = 1L;
 
-    @Mock
+    @Mock //
     private BeerRepository beerRepository;
 
     private BeerMapper beerMapper = BeerMapper.INSTANCE;
 
-    @InjectMocks
+    @InjectMocks // para injetar a classe beer repository
     private BeerService beerService;
 
     @Test
     void whenBeerInformedThenItShouldBeCreated() throws BeerAlreadyRegisteredException {
+        // quando uma cerveja for informada, então deveria ser criada
+
         // given
         BeerDTO expectedBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer expectedSavedBeer = beerMapper.toModel(expectedBeerDTO);
 
         // when
+        // simula as chamadas dos metodos
         when(beerRepository.findByName(expectedBeerDTO.getName())).thenReturn(Optional.empty());
         when(beerRepository.save(expectedSavedBeer)).thenReturn(expectedSavedBeer);
 
         //then
+        // beenService foi mockado
         BeerDTO createdBeerDTO = beerService.createBeer(expectedBeerDTO);
 
+        // MatcherAssert (valor esperado, retonado)
+        // é adicionado por importação estática para deixar mais fluente
         assertThat(createdBeerDTO.getId(), is(equalTo(expectedBeerDTO.getId())));
         assertThat(createdBeerDTO.getName(), is(equalTo(expectedBeerDTO.getName())));
         assertThat(createdBeerDTO.getQuantity(), is(equalTo(expectedBeerDTO.getQuantity())));
@@ -70,6 +76,8 @@ public class BeerServiceTest {
 
     @Test
     void whenAlreadyRegisteredBeerInformedThenAnExceptionShouldBeThrown() {
+        // quando uma cerveja já foi cadastrada, então dispare uma exceção
+
         // given
         BeerDTO expectedBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer duplicatedBeer = beerMapper.toModel(expectedBeerDTO);
@@ -83,6 +91,8 @@ public class BeerServiceTest {
 
     @Test
     void whenValidBeerNameIsGivenThenReturnABeer() throws BeerNotFoundException {
+        // Quando um nome válido é dado, então uma cerveja é retornado
+
         // given
         BeerDTO expectedFoundBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer expectedFoundBeer = beerMapper.toModel(expectedFoundBeerDTO);
@@ -98,6 +108,8 @@ public class BeerServiceTest {
 
     @Test
     void whenNotRegisteredBeerNameIsGivenThenThrowAnException() {
+        // Quando dado um nome de cerveja não registrado, então dispare uma exceção
+
         // given
         BeerDTO expectedFoundBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
 
@@ -105,11 +117,16 @@ public class BeerServiceTest {
         when(beerRepository.findByName(expectedFoundBeerDTO.getName())).thenReturn(Optional.empty());
 
         // then
-        assertThrows(BeerNotFoundException.class, () -> beerService.findByName(expectedFoundBeerDTO.getName()));
+        assertThrows(
+                BeerNotFoundException.class,
+                () -> beerService.findByName(expectedFoundBeerDTO.getName())
+        );
     }
 
     @Test
     void whenListBeerIsCalledThenReturnAListOfBeers() {
+        // Quando Lista de Cerveja é chamada, então retorne uma lista de cerveja
+
         // given
         BeerDTO expectedFoundBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer expectedFoundBeer = beerMapper.toModel(expectedFoundBeerDTO);
@@ -126,6 +143,8 @@ public class BeerServiceTest {
 
     @Test
     void whenListBeerIsCalledThenReturnAnEmptyListOfBeers() {
+        // Quando Lista de Cerveja é chamada, então retorne uma lista de cerveja vazia
+
         //when
         when(beerRepository.findAll()).thenReturn(Collections.EMPTY_LIST);
 
@@ -137,23 +156,29 @@ public class BeerServiceTest {
 
     @Test
     void whenExclusionIsCalledWithValidIdThenABeerShouldBeDeleted() throws BeerNotFoundException{
+        // Quando Exclusão é chamada com id valido, então uma cerveja deveria ser excluída
+
         // given
         BeerDTO expectedDeletedBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer expectedDeletedBeer = beerMapper.toModel(expectedDeletedBeerDTO);
 
         // when
         when(beerRepository.findById(expectedDeletedBeerDTO.getId())).thenReturn(Optional.of(expectedDeletedBeer));
-        doNothing().when(beerRepository).deleteById(expectedDeletedBeerDTO.getId());
+        doNothing() // não faz nada, porque o metodo delete não retorna nada
+                .when(beerRepository).deleteById(expectedDeletedBeerDTO.getId());
 
         // then
         beerService.deleteById(expectedDeletedBeerDTO.getId());
 
+        // verifica as chamadas ao metodo, uma vez que o metodo delete não tem retorno
         verify(beerRepository, times(1)).findById(expectedDeletedBeerDTO.getId());
         verify(beerRepository, times(1)).deleteById(expectedDeletedBeerDTO.getId());
     }
 
     @Test
     void whenIncrementIsCalledThenIncrementBeerStock() throws BeerNotFoundException, BeerStockExceededException {
+        // Quando incremento é chamado, então estoque de cerveja é incrementado
+
         //given
         BeerDTO expectedBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer expectedBeer = beerMapper.toModel(expectedBeerDTO);
@@ -174,6 +199,8 @@ public class BeerServiceTest {
 
     @Test
     void whenIncrementIsGreatherThanMaxThenThrowException() {
+        // Quando incremento é maior do que a quantidade máxima, então dispare uma exceção
+
         BeerDTO expectedBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer expectedBeer = beerMapper.toModel(expectedBeerDTO);
 
@@ -185,6 +212,8 @@ public class BeerServiceTest {
 
     @Test
     void whenIncrementAfterSumIsGreatherThanMaxThenThrowException() {
+        // Quando incremento após a soma é maior do que a quantidade máxima, então dispare uma exceção
+
         BeerDTO expectedBeerDTO = BeerDTOBuilder.builder().build().toBeerDTO();
         Beer expectedBeer = beerMapper.toModel(expectedBeerDTO);
 
@@ -196,6 +225,8 @@ public class BeerServiceTest {
 
     @Test
     void whenIncrementIsCalledWithInvalidIdThenThrowException() {
+        // Quando um incremento é chamado com um id inválido, então dispare uma exceção
+
         int quantityToIncrement = 10;
 
         when(beerRepository.findById(INVALID_BEER_ID)).thenReturn(Optional.empty());

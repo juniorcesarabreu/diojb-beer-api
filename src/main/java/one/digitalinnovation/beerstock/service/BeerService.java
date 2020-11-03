@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Service
+@Service // indica que todoo ciclo de vida será gerenciada pelo spring
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class BeerService {
 

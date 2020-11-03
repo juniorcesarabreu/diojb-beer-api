@@ -8,7 +8,7 @@ import lombok.Builder;
 import one.digitalinnovation.beerstock.dto.BeerDTO;
 import one.digitalinnovation.beerstock.enums.BeerType;
 
-@Builder
+@Builder // lombok: cria um objeto (que será usado em testes)
 public class BeerDTOBuilder {
 
     @Builder.Default

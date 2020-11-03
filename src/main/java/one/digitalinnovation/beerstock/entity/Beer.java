@@ -13,8 +13,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Data
-@Entity
+@Data // lombok: gera getters, setter, hashCode, equals
+@Entity // jpa: Mapeamento da entidade
 @NoArgsConstructor
 @AllArgsConstructor
 public class Beer {
